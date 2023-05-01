@@ -6,10 +6,12 @@ import Signup from './Components/Signup';
 import ForgotPassword from './Components/ForgotPassword';
 import Profile from './Components/Profile';
 import Offers from './Components/Offers';
+import Header from './Components/Header';
 function App() {
   return (
     <div className="App">
           <BrowserRouter>
+          <Header/>
     <Routes>
       <Route path='/' element={<Home/>} />
       <Route path='/sign-in' element={<SignIn/>} />
