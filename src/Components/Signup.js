@@ -1,9 +1,15 @@
 import React from 'react';
 import { useState } from 'react';
-import key from '../yoann-siloine-dyaxQ-aoGWY-unsplash.jpg';
+import key from '../SignUp-Pen-PS.png';
 import {AiFillEyeInvisible, AiFillEye } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import OAuth from './OAuth';
+import { getAuth, createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
+import {db} from '../Database/firebase';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 
 export default function SignUp() {
   const [showPassword, setShowPassword]= useState(false);
@@ -14,12 +20,37 @@ export default function SignUp() {
   });
 
   const {email, password, name}= formData;
+  const navigate= useNavigate();
   function onChange(e){
     setFormData((prevState)=>({
       ...prevState,
       [e.target.id]: e.target.value
     }))
   }
+
+async function onSubmit(e){
+    e.preventDefault()
+
+    try {
+      const auth= getAuth();
+      const userCredntials= await createUserWithEmailAndPassword(auth, email, password);
+      updateProfile(auth.currentUser, {
+        displayName: name
+      })
+      const user= userCredntials.user
+      const formDataDuplicate={...formData}
+      delete formDataDuplicate.password
+      formDataDuplicate.timestamp= serverTimestamp();
+
+      await setDoc(doc(db, "users", user.uid), formDataDuplicate)
+      navigate('/')
+      
+    } catch (error) {
+      toast.error("Something Went Wrong!")
+      
+    }
+   
+}
   return (
     <div>
 
@@ -35,7 +66,7 @@ export default function SignUp() {
     </div>
 
     <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'>
-      <form>
+      <form onSubmit={onSubmit}>
       <input 
         className='w-full px-4 py-2 text-md border-black rounded transition ease-linear mb-6' 
         type="text" 

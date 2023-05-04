@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import key from '../tingey-injury-law-firm-LJhXYHxPfEY-unsplash.jpg';
+import key from '../Thinking-small-PS.png';
 import { Link } from 'react-router-dom';
 import OAuth from './OAuth';
 
