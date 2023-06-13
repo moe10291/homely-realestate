@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import key from '../Thinking-small-PS.png';
+import forgotten from '../Thinking-small-PS.png';
 import { Link } from 'react-router-dom';
 import OAuth from './OAuth';
 
@@ -20,14 +20,17 @@ export default function ForgotPassword() {
 
 
     <section>
-      <h1 className='text-3xl text-center mt-8 font-serif font'> Forgot Password </h1>
+      <h1 className='text-3xl text-center mt-6 font-serif font'> Forgot Password </h1>
     </section>
     <div className='flex justify-center flex-wrap items-center px-6 py-12 max-w-6xl mx-auto'>
     <div className='md:w-[67%] lg:w-[50%] mb-12 md:mb-6'>
-      <img className='w-full ' src={key} alt="key"/>
+      <img className='w-full ' src={forgotten} alt="key"/>
     </div>
 
+    
+
     <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'>
+    {/* <p className='text-xl text-center mt-8 font-serif font mb-12'> Forgot Password </p> */}
       <form>
         <input 
         className='w-full px-4 py-2 text-md border-black rounded transition ease-linear mb-6' 

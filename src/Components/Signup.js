@@ -43,6 +43,7 @@ async function onSubmit(e){
       formDataDuplicate.timestamp= serverTimestamp();
 
       await setDoc(doc(db, "users", user.uid), formDataDuplicate)
+      toast.success("Hurray! You were Successfully Signed Up")
       navigate('/')
       
     } catch (error) {
