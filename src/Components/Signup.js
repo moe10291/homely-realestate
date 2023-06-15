@@ -16,9 +16,10 @@ export default function SignUp() {
   const [formData, setFormData]= useState({
     name: "",
     email: "",
-    password: ""
+    password: "",
+    returnSecureToken: true
   });
-
+  
   const {email, password, name}= formData;
   const navigate= useNavigate();
   function onChange(e){
@@ -27,10 +28,11 @@ export default function SignUp() {
       [e.target.id]: e.target.value
     }))
   }
-
-async function onSubmit(e){
+  
+  async function onSubmit(e){
+    console.log("HELLO")
     e.preventDefault()
-
+    
     try {
       const auth= getAuth();
       const userCredntials= await createUserWithEmailAndPassword(auth, email, password);
