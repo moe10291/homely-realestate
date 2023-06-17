@@ -3,6 +3,8 @@ import { useState } from 'react';
 import forgotten from '../Thinking-small-PS.png';
 import { Link } from 'react-router-dom';
 import OAuth from './OAuth';
+import { toast } from 'react-toastify';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 
 export default function ForgotPassword() {
   
@@ -12,6 +14,18 @@ export default function ForgotPassword() {
   function onChange(e){
     setEmail(e.target.value)
     console.log(setEmail)
+  }
+
+  async function onSubmit(e){
+    e.preventDefault();
+
+    try {
+      const auth= getAuth();
+      await sendPasswordResetEmail(auth, email)
+      toast.success("Reset Link Sent to the Email")
+    } catch (error) {
+      toast.error("Username is not found")
+    }
   }
   return (
     <div>
@@ -31,7 +45,7 @@ export default function ForgotPassword() {
 
     <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'>
     {/* <p className='text-xl text-center mt-8 font-serif font mb-12'> Forgot Password </p> */}
-      <form>
+      <form onSubmit={onSubmit}>
         <input 
         className='w-full px-4 py-2 text-md border-black rounded transition ease-linear mb-6' 
         type="email" 
