@@ -9,9 +9,10 @@ export default function CreateListing() {
     bathrooms: 1,
     parking: false,
     address:'',
-    description:''
+    description:'',
+    price: ''
   });
-  const {type, name, bedrooms, bathrooms, parking, address, description}= formData;
+  const {type, name, bedrooms, bathrooms, parking, address, description, price}= formData;
   function onChange(){
 
   }
@@ -111,7 +112,34 @@ export default function CreateListing() {
         placeholder="Property Description" 
         maxLength="300" minLength="5" required 
         className="w-full px-4 py-3 text-gray-700 border border-gray-400 rounded transition duration-150 ease-in-out focus:text-gray-700 focus:border-slate-600 mb-6 focus:bg-white"/>
+    
+        <div className='flex items-center space-x-4' >
+      <p className='text-lg font-semibold'>Price</p>
+      <div className='flex w-full justify-center space-x-5'>
+        <input 
+        type='number' 
+        id="price" 
+        value={price} 
+        onChange={onChange} 
+        min='50' max='5000000' required 
+        className='w-full px-4 py-2 tex-xl text-center text-gray-700 border-gray-300 rounded ease-in-out bg-white' />
+      {type ==='rent' && (
+        <div>
+          <p className='text-md w-full whitespace-nowrap'> $/Month</p>
+        </div>
+      )}
+      
+      </div>
+        </div>
+
+        <div>
+          <p className='mt-5'>Images</p>
+          <p className='text-sm text-gray-500'>First image will be the cover (max 6)</p>
+          <input type='file' id='images' onChange={onChange} accept='.jpg, .png, .jpeg' multiple required className='w-full px-3 py-2 text-gray-600 bg-white border border-gray-400 rounded transition ease-in-out' />
+        </div>
+        <button type='submit' className='mt-4 w-full bg-red-400 text-white uppercase px-7 py-3 text-sm font-medium rounded shadow-md hover:bg-red-500 transition ease-in-out duration-200 hover:shadow-lg active:bg-red-600'>Create Listing</button>
       </form>
+      
 
     </main>
   )
