@@ -1,7 +1,13 @@
 import React from 'react'
 import { useState } from 'react';
+import Spinner from './Spinner';
+import { toast } from 'react-toastify';
+
+
 
 export default function CreateListing() {
+  const [geolocationEnabled, setGeoLocationEnabled]= useState(true);
+  const [loading, setLoading]= useState(false);
   const [formData, setFormData]= useState({
     type: "rent",
     name:"",
@@ -10,34 +16,107 @@ export default function CreateListing() {
     parking: false,
     address:'',
     description:'',
-    price: ''
+    price: '',
+    latitude: 0,
+    longitude: 0,
+    images:[]
   });
-  const {type, name, bedrooms, bathrooms, parking, address, description, price}= formData;
-  function onChange(){
+  const {type, name, bedrooms, bathrooms, parking, address, description, price, latitude, longitude, images}= formData;
+  function onChange(e){
+    let boolean= null;
+    if(e.target.value === "true"){
+      boolean = true
+    }
+
+    if(e.target.value === "false"){
+      boolean = false
+    }
+    //This is for Files
+    if(e.target.files){
+      setFormData((prevState)=>({
+        ...prevState,
+        images: e.target.files
+      }))
+    }
+    //This is for the Text/Boolean/Number
+    if(!e.target.files){
+      setFormData((prevState)=>({
+        ...prevState,
+        [e.target.id]: boolean ?? e.target.value,
+      }))
+    }
 
   }
+  //ON SUBMIT FUNCTION
+  async function onSubmit(e){
+    e.preventDefault();
+    setLoading(true);
+    
+    //Set Images Condition to 6 MAX.
+    if(images.length > 6){
+      setLoading(false);
+      toast.error("Upto 6 images are Allowed")
+      return;
+    }
+    let geolocation={}
+    let location
+    if(geolocation){
+      const res= await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_GEOCODE_API}`);
+      const data= await res.json();
+      console.log(data)
+      geolocation.lat= data.results[0] ?.geometry.location.lat ??0
+      geolocation.long= data.results[0] ?.geometry.location.long ??0
+
+      location= data.status === "ZERO_RESULTS" && undefined;
+
+      if(location ===undefined || location.includes("undefined")){
+        setLoading(false);
+        toast.error ("Please Enter a Valid Address");
+        return;
+      }
+    } else {
+      geolocation.lat= latitude;
+      geolocation.long= longitude;
+    }
+    
+    
+  }
+
+  //SPINNER
+  if(loading){
+    return <Spinner/>
+  }
+
   return (
     <main className='max-w-md px-2 mx-auto'>
       <h1 className='text-3xl text-center mt-6 font-bold'>Add a Property</h1>
 
-      <form>
+      <form onSubmit={onSubmit}>
         <p className='tex-lg mt-6 font-semibold'>Sell/Rent</p>
         <div className='flex'>
-        <button 
-        type="button" 
-        id="type" 
-        value="sell" 
-        onClick={onChange}
-        className={`mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg transition duration-150 ease-in-out w-full ${type === "rent" ? "bg-white" : "bg-slate-600 text-white"}`}>
-        Sell</button>
+
+      {/* SELL BUTTON  */}
 
         <button 
         type="button" 
         id="type" 
-        value="sell" 
+        value="sale" 
+        onClick={onChange}
+        className={`mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg transition duration-150 ease-in-out w-full ${type === "rent" ? "bg-white" : "bg-slate-600 text-white"}`}>
+        Sell</button>
+
+      {/* RENT BUTTON */}
+
+        <button 
+        type="button" 
+        id="type" 
+        value="rent" 
         onClick={onChange}
         className={`ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg transition duration-150 ease-in-out w-full ${type === "sale" ? "bg-white" : "bg-slate-600 text-white"}`}>
         Rent </button>
+
+        {/* NAME OF THE PROPERTY  */}
+
         </div>
         <p className="text-lg mt-8 font-semibold">Name</p>
         <input 
@@ -49,7 +128,8 @@ export default function CreateListing() {
         maxLength="30" minLength="5" required 
         className="w-full px-4 py-3 text-gray-700 border border-gray-400 rounded transition duration-150 ease-in-out focus:text-gray-700 focus:border-slate-600 mb-6 focus:bg-white"/>
     
-    
+        {/* BEDROOMS */}
+
     <div className='flex justify-start space-x-8 mb-6'>
         <div>          
          <p className='text-lg font-semibold'>Beds</p>
@@ -61,6 +141,7 @@ export default function CreateListing() {
          onChange={onChange} 
          min="1" max="20" required />
         </div>
+      {/* WASHROOMS  */}
 
         <div>          
          <p className='text-lg font-semibold'>Baths</p>
@@ -74,6 +155,8 @@ export default function CreateListing() {
         </div>
     </div>
 
+      {/* PARKING BUTTON (YES) */}
+
     <p className='tex-lg mt-6 font-semibold'>Parking</p>
         <div className='flex'>
         <button 
@@ -84,6 +167,7 @@ export default function CreateListing() {
         className={`mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg transition duration-150 ease-in-out w-full ${!parking? "bg-white" : "bg-slate-600 text-white"}`}>
         Yes</button>
 
+      {/* PARKING BUTTON (NO)  */}
         <button 
         type="button" 
         id="parking" 
@@ -92,6 +176,8 @@ export default function CreateListing() {
         className={`ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg transition duration-150 ease-in-out w-full ${parking? "bg-white text-black" : "bg-slate-600 text-white"}`}>
         No </button>
         </div>
+
+        {/* ADDRESS  */}
 
         <p className="text-lg mt-8 font-semibold">Address</p>
         <textarea 
@@ -103,15 +189,35 @@ export default function CreateListing() {
         maxLength="100" minLength="5" required 
         className="w-full px-4 py-3 text-gray-700 border border-gray-400 rounded transition duration-150 ease-in-out focus:text-gray-700 focus:border-slate-600 mb-6 focus:bg-white"/>
 
-        <p className="text-lg mt-2 font-semibold">Description</p>
+        {/* LATITUDE  */}
+
+        {!geolocationEnabled && (
+          <div className='flex space-x-8 justify-start mb-6'>
+            <div>
+              <p className='text-lg font-semibold' >Latitude</p>
+              <input type='number' id="latitude" value={latitude} onChange={onChange} required className='w-full px-4 py-2 text-xl text-gray-700 bg-whote border border-gray-300 rounded focus:bg-white foxus:text-gray-700 focus:border-slate-600 text-center'/>
+            </div>
+
+            <div>
+              <p className='text-lg font-semibold' >Longitude</p>
+              <input type='number' id="latitude" value={longitude} onChange={onChange} required className='w-full px-4 py-2 text-xl text-gray-700 bg-whote border border-gray-300 rounded focus:bg-white foxus:text-gray-700 focus:border-slate-600 text-center'/>
+            </div>
+          </div>
+        )}
+
+      {/* DESCRIPTION  */}
+
+      <p className="text-lg mt-8 font-semibold">Description</p>
         <textarea 
         type="text" 
-        id="address" 
+        id="description" 
         value={description} 
         onChange={onChange} 
-        placeholder="Property Description" 
-        maxLength="300" minLength="5" required 
+        placeholder="Property Address" 
+        maxLength="100" minLength="5" required 
         className="w-full px-4 py-3 text-gray-700 border border-gray-400 rounded transition duration-150 ease-in-out focus:text-gray-700 focus:border-slate-600 mb-6 focus:bg-white"/>
+
+        {/* PRICE  */}
     
         <div className='flex items-center space-x-4' >
       <p className='text-lg font-semibold'>Price</p>
@@ -131,6 +237,8 @@ export default function CreateListing() {
       
       </div>
         </div>
+
+        {/* IMAGES  */}
 
         <div>
           <p className='mt-5'>Images</p>

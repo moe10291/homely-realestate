@@ -92,7 +92,7 @@ export default function Profile() {
 
           <button type="submit"
           className='w-full bg-red-400 text-white uppercase px-7 py-3 text-sm font-medium rounded shadow-md hover:bg-red-500 transition ease-in-out duration-200 hover:shadow-lg active:bg-red-600'>
-            <Link to="/create-list"
+            <Link to="/create-listing"
             className='flex justify-center items-center'>
             <FcHome className='mr-3 text-3xl bg-white rounded-full p-1'/>
             Sell or Rent Your Property            
